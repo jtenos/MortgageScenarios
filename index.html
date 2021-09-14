@@ -11,39 +11,112 @@
 
 <body>
     <div class=container>
-        <form>
-            <div>
-                <label for=purchase-price class=form-label>Purchase price</label>
-                <input type=number class=form-control id=purchase-price>
+        <div class=row>
+            <div class=col-6>
+                <form>
+                    <div>
+                        <label for=purchase-price class=form-label>Purchase price</label>
+                        <input type=number class=form-control id=purchase-price onkeyup="calculateLoanAmount()">
+                    </div>
+                    <div>
+                        <label for=interest-rate class=form-label>Interest rate</label>
+                        <input type=number class=form-control step=0.001 id=interest-rate>
+                    </div>
+                    <div>
+                        <label for=months class=form-label onkeyup="">Months</label>
+                        <select class=form-control id=months>
+                            <option value=360>360</option>
+                            <option value=180>180</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for=down-payment class=form-label>Down payment <button type=button
+                                onclick="setTo20Percent();">20%</button></label>
+                        <input type=number class=form-control id=down-payment onkeyup="calculateLoanAmount()">
+                    </div>
+                    <div>
+                        <label for=closing-costs class=form-label>Closing costs</label>
+                        <button type=button onclick="closingCostsPercent(2);">2%</button>
+                        <button type=button onclick="closingCostsPercent(5);">5%</button>
+                        <input type=number class=form-control id=closing-costs onkeyup="calculateLoanAmount()">
+                    </div>
+                    <div>
+                        <label for=hazard class=form-label>Insurance (Monthly)</label>
+                        <button type=button onclick="hazardPercent(.25);">0.25%</button>
+                        <input type=number class=form-control id=hazard onkeyup="calculatePayments()">
+                    </div>
+                </form>
             </div>
-            <div>
-                <label for=interest-rate class=form-label>Interest rate</label>
-                <input type=number class=form-control step=0.001 id=interest-rate>
-             </div>
-             <div>
-                 <label for=months class=form-label>Months</label>
-                 <select class=form-control>
-                     <option>360</option>
-                     <option>180</option>
-                 </select>
-             </div>
-             <div>
-                 <label for=down-payment class=form-label>Down payment <button onclick="setTo20Percent();">20%</button></label>
-                 <input type=number class=form-control id=down-payment>
-             </div>
-        </form>
+            <div class=col-6>
+                <div>
+                    <label for=loan-amount class=form-label>Loan amount</label>
+                    <input type=number class=form-control id=loan-amount readonly>
+                </div>
+                <div>
+                    <label for=cash-to-close class=form-label>Cash to close</label>
+                    <input type=number class=form-control id=cash-to-close readonly>
+                </div>
+                <div>
+                    <label for=monthly-p-and-i class=form-label>Monthly P&I</label>
+                    <input type=number class=form-control id=monthly-p-and-i readonly>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
         crossorigin="anonymous"></script>
 
-        <script>
-            function setTo20Percent() {
-                document.getElementById("down-payment").value = Math.round(parseFloat(document.getElementById("purchase-price")) * .2);
-                return false;
+    <script>
+        function setTo20Percent() {
+            const purchasePrice = parseFloat(document.querySelector("#purchase-price").value);
+            const downPayment = Math.round(purchasePrice * 0.2);
+            document.querySelector("#down-payment").value = downPayment;
+            calculateLoanAmount();
+        }
+        function closingCostsPercent(percent) {
+            const purchasePrice = parseFloat(document.querySelector("#purchase-price").value);
+            const downPayment = parseFloat(document.querySelector("#down-payment").value);
+            const loanAmount = purchasePrice - downPayment;
+            const closingCosts = Math.round(loanAmount * percent / 100);
+            document.querySelector("#closing-costs").value = closingCosts;
+            calculateCashToClose();
+        }
+        function calculateLoanAmount() {
+            try {
+                const purchasePrice = parseFloat(document.querySelector("#purchase-price").value);
+                const downPayment = parseFloat(document.querySelector("#down-payment").value);
+                const loanAmount = Math.round(purchasePrice - downPayment);
+                document.querySelector("#loan-amount").value = loanAmount;
+            } catch (ex) {
+                document.querySelector("#loan-amount").value = "";
             }
-        </script>
+            calculateCashToClose();
+        }
+        function calculateCashToClose() {
+            const downPayment = parseFloat(document.querySelector("#down-payment").value);
+            const closingCosts = parseFloat(document.querySelector("#closing-costs").value);
+            const cashToClose = Math.round(downPayment + closingCosts);
+            document.querySelector("#cash-to-close").value = cashToClose;
+        }
+        function hazardPercent(percent) {
+            const purchasePrice = parseFloat(document.querySelector("#purchase-price").value);
+            const hazardMonthly = Math.round(purchasePrice * percent / 100 / 12);
+            document.querySelector("#hazard").value = hazardMonthly;
+            calculatePayments();
+        }
+        function calculatePayments() {
+            const pAndI = calculatePAndI();
+            document.querySelector("#monthly-p-and-i").value = pAndI;
+        }
+        function calculatePAndI() {
+            const rate = parseFloat(document.querySelector("#interest-rate").value) / 100 / 12;
+            const pv = parseFloat(document.querySelector("#loan-amount").value);
+            const numPayments = parseInt(document.querySelector("#months").value);
+            return Math.round(pv * (rate * Math.pow(1 + rate, numPayments)) / (Math.pow(1 + rate, numPayments) - 1));
+        }
+    </script>
 </body>
 
 </html>
