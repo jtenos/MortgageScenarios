@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+    <title>Mortgage Scenarios</title>
+</head>
+
+<body>
+    <div class=container>
+        <form>
+            <div>
+                <label for=purchase-price class=form-label>Purchase price</label>
+                <input type=number class=form-control id=purchase-price>
+            </div>
+            <div>
+                <label for=interest-rate class=form-label>Interest rate</label>
+                <input type=number class=form-control step=0.001 id=interest-rate>
+             </div>
+             <div>
+                 <label for=months class=form-label>Months</label>
+                 <select class=form-control>
+                     <option>360</option>
+                     <option>180</option>
+                 </select>
+             </div>
+             <div>
+                 <label for=down-payment class=form-label>Down payment <button onclick="setTo20Percent();">20%</button></label>
+                 <input type=number class=form-control id=down-payment>
+             </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
+        crossorigin="anonymous"></script>
+
+        <script>
+            function setTo20Percent() {
+                document.getElementById("down-payment").value = Math.round(parseFloat(document.getElementById("purchase-price")) * .2);
+                return false;
+            }
+        </script>
+</body>
+
+</html>
